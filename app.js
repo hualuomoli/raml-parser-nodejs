@@ -2,10 +2,14 @@ var parser = require('./parser');
 var server = require('./server');
 var path = require('path');
 var fs = require('fs');
+var _ = require('underscore');
 
+// arguments
 var filepath = path.join(path.join(process.cwd()), 'tmp');
+var arguments = process.argv.slice(2);
+var raml = arguments.length === 2 ? arguments[1] : 'raml/api.raml';
 
-parser.parse('raml/api.raml', function (ramlApis) {
+parser.parse(raml, function (ramlApis) {
 
   server.createPath(filepath);
 
