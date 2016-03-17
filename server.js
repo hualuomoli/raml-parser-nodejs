@@ -107,13 +107,21 @@ function getMethodApiRoutesResponse(responses) {
       // console.log('example:%s', example.example);
 
       data += '  case ' + example.statusCode + ':\n';
-      data += "    res.send('" + example.example + "');\n";
+      data += "    var msg = '';\n";
+      for (var i = 0; i < example.example.length; i++) {
+        data += "    msg += '" + example.example[i] + "\\n';\n";
+      }
+      data += "    res.send(msg);\n";
       data += '    break;\n';
     }
 
     // default
     data += '  default:\n';
-    data += "    res.send('" + def.example + "');\n";
+    data += "    var msg = '';\n";
+    for (var i = 0; i < def.example.length; i++) {
+      data += "    msg += '" + def.example[i] + "\\n';\n";
+    }
+    data += "    res.send(msg);\n";
 
     data += '  }\n';
   }
@@ -144,7 +152,7 @@ function getResponseExamples(responses) {
     if (!application || !application.example) {
       continue;
     }
-    example.example = trim(application.example);
+    example.example = getExample(application.example);
 
     examples.push(example);
 
@@ -182,6 +190,18 @@ function getFooter() {
   return 'module.exports = router;';
 }
 
+// get example
+function getExample(example) {
+  var data = [];
+  if (!example) {
+    return data;
+  }
+  var array = example.replace(/[']/g, "\\'").split('\n');
+  for (var i = 0; i < array.length; i++) {
+    data.push(array[i]);
+  }
+  return data;
+}
 // trim
 function trim(data) {
   if (!data) {
