@@ -137,7 +137,7 @@ function getResponseExamples(responses) {
     example.description = tmp.description || '';
     tmp = tmp.body;
     if (!tmp || tmp.size === 0) {
-      console.warn('status '.red + statusCode + ' does not have body.');
+      console.log('status '.red + statusCode + ' does not have body.');
       continue;
     }
     var application = tmp['application/json'] || tmp['application/xml'] || tmp['application/x-www-form-urlencoded'] || tmp['multipart/form-data'];
