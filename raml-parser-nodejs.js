@@ -4,24 +4,38 @@ var path = require('path');
 var fs = require('fs');
 var _ = require('underscore');
 
-// arguments
-var filepath = path.join(path.join(process.cwd()), 'tmp');
-var arguments = process.argv.slice(2);
-var raml = arguments.length === 2 ? arguments[1] : 'raml/api.raml';
+var creator = {
 
-parser.parse(raml, function (ramlApis) {
+};
 
-  server.createPath(filepath);
+/**
+ * create
+ * @param  raml     raml file
+ * @param  filepath out file path
+ */
+creator.create = function (raml, tplpath, filepath) {
+  if (!filepath) {
+    filepath = './output';
+  }
+  // parse raml
+  parser.parse(raml, function (ramlApis) {
+    // crate filepath
+    server.createPath(filepath);
+    // routes
+    createRoutes(ramlApis, filepath);
+    // srver app.js
+    createServerApp(ramlApis, filepath, tplpath);
+  });
+}
 
-  // routes
-  createRoutes(ramlApis);
-  // srver app.js
-  createServerApp(ramlApis);
-});
+module.exports = creator;
 
+///////////////
+/// defined ///
+///////////////
 
-//////////
-function createRoutes(ramlApis) {
+// create routes
+function createRoutes(ramlApis, filepath) {
   for (var i = 0; i < ramlApis.length; i++) {
     var ramlApi = ramlApis[i];
     var uri = ramlApi.uri;
@@ -34,7 +48,12 @@ function createRoutes(ramlApis) {
 }
 
 // create server app.js
-function createServerApp(ramlApis) {
+function createServerApp(ramlApis, filepath, tplpath) {
+
+  if (!tplpath) {
+    tplpath = './node_modules/raml-parser-nodejs/';
+  }
+
   var routeStr = '';
   var useRouteStr = '';
 
@@ -50,12 +69,12 @@ function createServerApp(ramlApis) {
 
   }
 
-  fs.readFile('tpl/app.js', 'utf-8', function (err, datas) {
+  fs.readFile(path.join(tplpath, 'tpl/app.js'), 'utf-8', function (err, datas) {
     var content = datas.replace('// require routes', routeStr).replace('// set routes', useRouteStr);
     fs.writeFile(path.join(filepath, 'app.js'), content);
   });
 
-  fs.readFile('tpl/package.json', 'utf-8', function (err, datas) {
+  fs.readFile(path.join(tplpath, 'tpl/package.json'), 'utf-8', function (err, datas) {
     fs.writeFile(path.join(filepath, 'package.json'), datas);
   });
 
