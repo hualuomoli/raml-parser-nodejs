@@ -73,7 +73,7 @@ function getMethodApiRoutes(method, url, uriParameters) {
   // url
   data += "  console.log('url:'.green + '" + realUrl + "');\n";
   // param
-  data += "  console.log('param:'.grey + req.param);\n";
+  data += "  console.log('parameters:'.grey + JSON.stringify(req.parameters || {}));\n";
   // return
   data += getMethodApiRoutesResponse(method.responses);
   // foot
@@ -92,11 +92,12 @@ function getMethodApiRoutesResponse(responses) {
   if (examples.length > 0) {
     var def = examples[0];
 
-    data += '  var expectResCode = req.param.expectResCode;\n';
+    data += '  var expectResCode = req.query.expectResCode;\n';
     data += '  if (!expectResCode) {\n';
-    data += '    expectResCode = ' + def.statusCode + ';\n';
+    data += '    expectResCode = \'' + def.statusCode + '\';\n';
     data += '  }\n';
-    // switch
+    data += '  expectResCode = parseInt(expectResCode);\n'
+      // switch
     data += '  switch (expectResCode) {\n';
 
     for (var i = 0; i < examples.length; i++) {
@@ -186,7 +187,7 @@ function trim(data) {
   if (!data) {
     return '';
   }
-  return data.replace(/[\r]/g, "").replace(/[\n]/g, " ").replace(/[']/g, "\\'");
+  return data.replace(/[\r]/g, "").replace(/[\t]/g, " ").replace(/[\n]/g, " ").replace(/[']/g, "\\'");
 }
 
 // create route path
