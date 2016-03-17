@@ -1,0 +1,35 @@
+{
+  "name": "raml-parser-nodejs",
+  "version": "1.0.0",
+  "description": "parse raml api to create nodejs server",
+  "main": "app.js",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "fs": "0.0.2",
+    "path": "^0.12.7",
+    "raml-parser": "^0.8.15",
+    "underscore": "^1.8.3",
+    "underscore.string": "^3.3.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hualuomoli/raml-parser-nodejs.git"
+  },
+  "keywords": [
+    "parse",
+    "nodejs",
+    "raml",
+    "api"
+  ],
+  "author": "hualuomoli",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hualuomoli/raml-parser-nodejs/issues"
+  },
+  "homepage": "https://github.com/hualuomoli/raml-parser-nodejs#readme"
+}

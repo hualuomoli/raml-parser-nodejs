@@ -1,4 +1,3 @@
-var ramlParser = require('raml-parser');
 var fs = require('fs');
 var path = require('path');
 var colors = require('colors');

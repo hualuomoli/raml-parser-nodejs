@@ -10,7 +10,7 @@ parser.parse('raml/api.raml', function (ramlApis) {
   server.createPath(filepath);
 
   // routes
-  // createRoutes(ramlApis);
+  createRoutes(ramlApis);
   // srver app.js
   createServerApp(ramlApis);
 });
@@ -48,7 +48,11 @@ function createServerApp(ramlApis) {
 
   fs.readFile('server-app.js', 'utf-8', function (err, datas) {
     var content = datas.replace('// require routes', routeStr).replace('// set routes', useRouteStr);
-    fs.writeFile(path.join(filepath, 'create-servers.js'), content);
+    fs.writeFile(path.join(filepath, 'app.js'), content);
+  });
+
+  fs.readFile('server-package.json', 'utf-8', function (err, datas) {
+    fs.writeFile(path.join(filepath, 'package.json'), datas);
   });
 
 }
