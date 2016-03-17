@@ -73,7 +73,7 @@ function getMethodApiRoutes(method, url, uriParameters) {
   // url
   data += "  console.log('url:'.green + '" + realUrl + "');\n";
   // param
-  data += "  console.log('parameters:'.grey + JSON.stringify(req.parameters || {}));\n";
+  data += "  console.log('parameters:'.grey + JSON.stringify(req.parameters));\n";
   // return
   data += getMethodApiRoutesResponse(method.responses);
   // foot
@@ -92,7 +92,7 @@ function getMethodApiRoutesResponse(responses) {
   if (examples.length > 0) {
     var def = examples[0];
 
-    data += '  var expectResCode = req.query.expectResCode;\n';
+    data += '  var expectResCode = req.parameters.expectResCode;\n';
     data += '  if (!expectResCode) {\n';
     data += '    expectResCode = \'' + def.statusCode + '\';\n';
     data += '  }\n';
