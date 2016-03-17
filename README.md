@@ -2,11 +2,18 @@
 解析raml的api生成nodejs的服务端
 
 # 使用说明
-- 下载本项目`git clone https://github.com/hualuomoli/raml-parser-nodejs.git`
-- 安装依赖`npm install`
-- 执行命令`node app.js -raml raml文件路径` (默认输出到tpm目录下) 
+- 安装`npm install --save https://github.com/hualuomoli/raml-parser-nodejs.git`
+- 编写测试文件`app.js`
+    ```
+    var creator = require('raml-parser-nodejs')
+    creator.create(raml文件路径);
+    ```
+- 执行命令`node app.js` 生成raml的服务端
+- 启动raml服务端
+    ```
+    cd output
+    npm install
+    node app.js
+    ```
 
-# Raml服务端
-- 进入`tmp`命令 `cd tmp`
-- 安装依赖`npm install`
-- 执行命令`node app.js` 服务器启动在3000端口
+
