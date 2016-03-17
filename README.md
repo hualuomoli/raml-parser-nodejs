@@ -6,3 +6,7 @@
 - 安装依赖`npm install`
 - 执行命令`node app.js -raml raml文件路径` (默认输出到tpm目录下) 
 
+# Raml服务端
+- 进入`tmp`命令 `cd tmp`
+- 安装依赖`npm install`
+- 执行命令`node app.js` 服务器启动在3000端口
