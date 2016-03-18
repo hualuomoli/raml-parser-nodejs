@@ -89,44 +89,69 @@ function getMethodApiRoutesResponse(responses) {
   }
 
   var examples = getResponseExamples(responses);
-  if (examples.length > 0) {
-    var def = examples[0];
-
-    data += '  var expectResCode = req.parameters.expectResCode;\n';
-    data += '  if (!expectResCode) {\n';
-    data += '    expectResCode = \'' + def.statusCode + '\';\n';
-    data += '  }\n';
-    data += '  expectResCode = parseInt(expectResCode);\n'
-      // switch
-    data += '  switch (expectResCode) {\n';
-
-    for (var i = 0; i < examples.length; i++) {
-      var example = examples[i];
-      // console.log('statusCode:%s', example.statusCode);
-      // console.log('description:%s', example.description);
-      // console.log('example:%s', example.example);
-
-      data += '  case ' + example.statusCode + ':\n';
-      data += "    var msg = '';\n";
-      for (var i = 0; i < example.example.length; i++) {
-        data += "    msg += '" + example.example[i] + "\\n';\n";
-      }
-      data += "    res.send(msg);\n";
-      data += '    break;\n';
-    }
-
-    // default
-    data += '  default:\n';
-    data += "    var msg = '';\n";
-    for (var i = 0; i < def.example.length; i++) {
-      data += "    msg += '" + def.example[i] + "\\n';\n";
-    }
-    data += "    res.send(msg);\n";
-
-    data += '  }\n';
+  // there is not response
+  if (examples.datas.length === 0) {
+    data += '  res.end();\n';
+    return data;
   }
 
+  // expectResCode
+  data += '  var expectResCode = req.parameters.expectResCode;\n';
+  data += '  if (!expectResCode) {\n';
+  data += "    expectResCode = '" + examples.defaultStatusCode + "';\n";
+  data += '  }\n';
+  data += '  expectResCode = parseInt(expectResCode);\n';
+
+  // some example
+  for (var i = 0; i < examples.datas.length; i++) {
+    var example = examples.datas[i];
+    data += getMethodApiRoutesResponseExample(example);
+  }
+
+  data += '\n';
   data += '  res.end();\n';
+
+  return data;
+}
+
+// get api method route response example
+function getMethodApiRoutesResponseExample(example) {
+  var data = '';
+
+  data += '\n';
+  data += "  if (expectResCode === " + example.statusCode + ") {\n";
+  data += "    console.log('description " + example.description + "'.green);\n";
+  var contentTypes = example.contentTypes;
+  if (contentTypes.length > 0) {
+    // expectResType
+    data += '    var expectResType = req.parameters.expectResType;\n';
+    data += '    if (!expectResType) {\n';
+    data += '      expectResType = \'' + example.defaultContentType + '\';\n';
+    data += '    }\n';
+
+    // contentType
+    for (var i = 0; i < contentTypes.length; i++) {
+      var ct = contentTypes[i];
+      data += "    if (expectResType === '" + ct.contentType + "') {\n";
+      // contentType
+      data += "      res.setHeader('Content-Type', '" + ct.contentType + "');\n";
+      var example = ct.example;
+      if (!example || example.length === 0) {
+        data += "      res.end();\n";
+        continue;
+      }
+      data += "      var msg = '';\n";
+      for (var j = 0; j < example.length; j++) {
+        data += "      msg += '" + example[j] + "\\n';\n";
+      }
+      data += "      res.send(msg);\n";
+      // --
+      data += '    }\n';
+    }
+
+  }
+
+  data += "  }\n";
 
   return data;
 }
@@ -134,11 +159,20 @@ function getMethodApiRoutesResponse(responses) {
 // get response example
 function getResponseExamples(responses) {
   // statusCode - body
-  var examples = [];
+  var examples = {
+    // defaultStatusCode
+    datas: []
+  };
   for (var statusCode in responses) {
+    // set default
+    if (!examples.defaultStatusCode) {
+      examples.defaultStatusCode = statusCode;
+    }
+
     var example = {
       // statusCode
-      // example
+      // description
+      // contentTypes
     };
     example.statusCode = statusCode;
     var tmp = responses[statusCode];
@@ -148,13 +182,27 @@ function getResponseExamples(responses) {
       console.log('status '.red + statusCode + ' does not have body.');
       continue;
     }
-    var application = tmp['application/json'] || tmp['application/xml'] || tmp['application/x-www-form-urlencoded'] || tmp['multipart/form-data'];
-    if (!application || !application.example) {
-      continue;
-    }
-    example.example = getExample(application.example);
+    var contentTypes = [];
+    for (var contentType in tmp) {
+      // set default
+      if (!example.defaultContentType) {
+        example.defaultContentType = contentType;
+      }
+      var ct = {
+        // contentType
+        // example
+        // schema
+      };
 
-    examples.push(example);
+      ct.contentType = contentType;
+      ct.example = getExample(tmp[contentType].example);
+      ct.schema = getSchema(tmp[contentType].schema);
+
+      contentTypes.push(ct);
+    }
+    example.contentTypes = contentTypes;
+
+    examples.datas.push(example);
 
   }
   return examples;
@@ -202,12 +250,17 @@ function getExample(example) {
   }
   return data;
 }
+
+function getSchema(schema) {
+  return getExample(schema);
+}
+
 // trim
 function trim(data) {
   if (!data) {
     return '';
   }
-  return data.replace(/[\r]/g, "").replace(/[\t]/g, " ").replace(/[\n]/g, " ").replace(/[']/g, "\\'");
+  return data.replace(/[\r]/g, "").replace(/[\t]/g, " ").replace(/[\n]/g, "\\\\n").replace(/[']/g, "\\'");
 }
 
 // create route path
