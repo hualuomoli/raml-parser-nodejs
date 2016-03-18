@@ -1,6 +1,6 @@
 {
   "name": "raml-parser-nodejs",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "parse raml api to create nodejs server",
   "main": "app.js",
   "dependencies": {
