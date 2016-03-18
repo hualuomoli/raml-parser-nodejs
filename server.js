@@ -120,7 +120,13 @@ function getMethodApiRoutesResponseExample(example) {
 
   data += '\n';
   data += "  if (expectResCode === " + example.statusCode + ") {\n";
-  data += "    console.log('description " + example.description + "'.green);\n";
+  data += "    console.log('description '.green);\n";
+  var description = example.description;
+  if (description && description.length > 0) {
+    for (var i = 0; i < description.length; i++) {
+      data += "    console.log('    " + description[i] + "');\n";
+    }
+  }
   var contentTypes = example.contentTypes;
   if (contentTypes.length > 0) {
     // expectResType
@@ -176,7 +182,7 @@ function getResponseExamples(responses) {
     };
     example.statusCode = statusCode;
     var tmp = responses[statusCode];
-    example.description = tmp.description || '';
+    example.description = getDescription(tmp.description);
     tmp = tmp.body;
     if (!tmp || tmp.size === 0) {
       console.log('status '.red + statusCode + ' does not have body.');
@@ -238,7 +244,7 @@ function getFooter() {
   return 'module.exports = router;';
 }
 
-// get example
+// response example
 function getExample(example) {
   var data = [];
   if (!example) {
@@ -250,9 +256,14 @@ function getExample(example) {
   }
   return data;
 }
-
+// response - schema
 function getSchema(schema) {
   return getExample(schema);
+}
+
+// response - description
+function getDescription(description) {
+  return getExample(description);
 }
 
 // trim
